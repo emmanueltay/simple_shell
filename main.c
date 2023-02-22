@@ -63,9 +63,11 @@ int main(int ac __attribute__((unused)), char **argv)
 		argv[i] = NULL;
 
 
-		printf("%s\n", lineptr);/*printing the input*/
-
-		free(lineptr);
+		/*executing the command*/
+		execmd(argv);
+	
 	}
+	free(lineptr);
+	free(lineptr_copy);
 	return (0);
 }
