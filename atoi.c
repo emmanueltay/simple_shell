@@ -1,97 +1,74 @@
-#include "main.h"
+#include "shell.h"
 
 /**
- * free_memory_p - frees a pointer
- * @ptr: pointer to be freed
- * Return: no value
+ * interactive - returns true if shell is interactive mode
+ * @info: struct address
+ *
+ * Return: 1 if interactive mode, 0 otherwise
  */
-
-void free_memory_p(char *ptr)
+int interactive(info_t *info)
 {
-	if (ptr != NULL)
-	{
-		free(ptr);
-		ptr = NULL;
-	}
-	ptr = NULL;
+	return (isatty(STDIN_FILENO) && info->readfd <= 2);
 }
 
 /**
- * free_memory_pp - Free a double pointer
- * @ptr: double pointer to be freed
- * Return: no value
+ * is_delim - checks if character is a delimeter
+ * @c: the char to check
+ * @delim: the delimeter string
+ * Return: 1 if true, 0 if false
  */
-
-void free_memory_pp(char **ptr)
+int is_delim(char c, char *delim)
 {
-	char **temp;
-
-	for (temp = ptr; *temp != NULL; temp++)
-		free_memory_p(*temp);
-	free(ptr);
+	while (*delim)
+		if (*delim++ == c)
+			return (1);
+	return (0);
 }
 
 /**
- * cmp - checks if a string in another
- * @s1: the string to be searched
- * @s2: the string being searched for
- * Return: 1 if found, else 0
+ *_isalpha - checks for alphabetic character
+ *@c: The character to input
+ *Return: 1 if c is alphabetic, 0 otherwise
  */
 
-int cmp(const char *s1, const char *s2)
+int _isalpha(int c)
 {
-	while (*s1 && *s2)
-		if (*s1++ != *s2++)
-			return (0);
-	return (*s2 == '\0');
+	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+		return (1);
+	else
+		return (0);
 }
 
-
 /**
- * _isalpha - checks if a character is a letter
- * @c: the given character
- * Return: TRUE if true, else FALSE
- */
-
-int _isalpha(char c)
-{
-	if ((c >= 48) && (c <= 57))
-		return (FALSE);
-	return (TRUE);
-}
-
-
-/**
- * _atoi - convert a string to an integer
- * @s: the string to be converted.
- * Return: the integer
+ *_atoi - converts a string to an integer
+ *@s: the string to be converted
+ *Return: 0 if no numbers in string, converted number otherwise
  */
 
 int _atoi(char *s)
 {
-	int len, i = 0, FLAG = 0, d = 0, n = 0, digit;
+	int i, sign = 1, flag = 0, output;
+	unsigned int result = 0;
 
-	for (len = 0; s[len] != '\0';)
-		len++;
-
-	while (i < len && FLAG == 0)
+	for (i = 0;  s[i] != '\0' && flag != 2; i++)
 	{
 		if (s[i] == '-')
-			++d;
-		if (s[i] >= 48 && s[i] <= 57)
+			sign *= -1;
+
+		if (s[i] >= '0' && s[i] <= '9')
 		{
-			digit = s[i] - '0';
-			if (d % 2)
-				digit = -digit;
-			n = n * 10 + digit;
-			FLAG = 1;
-			if (s[i + 1] < 48 || s[i + 1] > 57)
-				break;
-			FLAG = 0;
+			flag = 1;
+			result *= 10;
+			result += (s[i] - '0');
 		}
-		i++;
+		else if (flag == 1)
+			flag = 2;
 	}
-	if (FLAG == 0)
-		return (0);
-	return (n);
+
+	if (sign == -1)
+		output = -result;
+	else
+		output = result;
+
+	return (output);
 }

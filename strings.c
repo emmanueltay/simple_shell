@@ -1,97 +1,87 @@
-#include "main.h"
+#include "shell.h"
 
 /**
- * _strlen - finds the length of a string
- * @s: the given string
+ * _strcpy - copies a string
+ * @dest: the destination
+ * @src: the source
  *
- * Return: the length
+ * Return: pointer to destination
  */
-int _strlen(const char *s)
+char *_strcpy(char *dest, char *src)
 {
 	int i = 0;
 
-	if (!s)
-		return (0);
-
-	while (*s++)
-		i++;
-
-	return (i);
-}
-
-/**
- * _strstr - Implementation of the strstr function
- * @haystack: Just as the name suggests
- * @needle: the string to be searched for
- *
- * Return: a pointer to the first character of @needle
- * in @haystack if found, else NULL
- */
-char *_strstr(char *haystack, char *needle)
-{
-	while (*haystack)
-	{
-		if ((*haystack == *needle) && cmp(haystack, needle))
-			return (haystack);
-		haystack++;
-	}
-
-	return (NULL);
-}
-
-/**
- * _strcpy - copies the content of a string to another
- * @dest: the destination string
- * @src: the source of the contents to be copied
- *
- * Return: @dest
- */
-char *_strcpy(char *dest, const char *src)
-{
-	char *temp = dest;
-
-	while (*src)
-		*temp++ = *src++;
-
-	*temp = '\0';
-
-	return (dest);
-}
-
-/**
- * _strcat - concatenates two strings
- * @dest: the destination string
- * @src: the source string
- *
- * Return: the result of concatenation
- */
-char *_strcat(char *dest, const char *src)
-{
-	int len_dest, i = 0;
-
-	len_dest = _strlen(dest);
-
+	if (dest == src || src == 0)
+		return (dest);
 	while (src[i])
-		dest[len_dest++] = src[i++];
-	dest[len_dest] = '\0';
-
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	dest[i] = 0;
 	return (dest);
 }
 
 /**
- * _strcmp - Compares two strings
- * @s1: first string
- * @s2: second string
+ * _strdup - duplicates a string
+ * @str: the string to duplicate
  *
- * Return: 0 if equal, -ve if @s1 < @s2, else +ve
+ * Return: pointer to the duplicated string
  */
-int _strcmp(char *s1, char *s2)
+char *_strdup(const char *str)
 {
-	int i;
+	int length = 0;
+	char *ret;
 
-	for (i = 0; s1[i]; i++)
-		if (s1[i] != s2[i])
-			return (s1[i] - s2[i]);
+	if (str == NULL)
+		return (NULL);
+	while (*str++)
+		length++;
+	ret = malloc(sizeof(char) * (length + 1));
+	if (!ret)
+		return (NULL);
+	for (length++; length--;)
+		ret[length] = *--str;
+	return (ret);
+}
 
-	return (0);
+/**
+ *_puts - prints an input string
+ *@str: the string to be printed
+ *
+ * Return: Nothing
+ */
+void _puts(char *str)
+{
+	int i = 0;
+
+	if (!str)
+		return;
+	while (str[i] != '\0')
+	{
+		_putchar(str[i]);
+		i++;
+	}
+}
+
+/**
+ * _putchar - writes the character c to stdout
+ * @c: The character to print
+ *
+ * Return: On success 1.
+ * On error, -1 is returned, and errno is set appropriately.
+ */
+int _putchar(char c)
+{
+	static int i;
+	static char buf[WRITE_BUF_SIZE];
+
+	if (c == BUF_FLUSH || i >= WRITE_BUF_SIZE)
+	{
+		write(1, buf, i);
+		i = 0;
+	}
+	if (c != BUF_FLUSH)
+		buf[i++] = c;
+	return (1);
 }
