@@ -1,105 +1,97 @@
 #include "main.h"
 
 /**
- * is_builtin - checks if a command is a builtin command
- * @cmd: the given command
- *
- * Return: the position of @cmd in the builtins array, else -1
+ * _myexit - exits the shell
+ * @info: Structure containing potential arguments. Used to maintain
+ *          constant function prototype.
+ *  Return: exits with a given exit status
+ *         (0) if info.argv[0] != "exit"
  */
-builtin_t is_builtin(char *cmd)
+int _myexit(info_t *info)
 {
-	builtin_t builtins[] = {
-		{"exit", exit_cmd},
-		{"env", env_cmd},
-		{NULL, NULL}
-	};
+	int exitcheck;
 
-	int i;
-
-	for (i = 0; builtins[i].cmd; i++)
-		if (_strcmp(builtins[i].cmd, cmd) == 0)
-			return (builtins[i]);
-
-	return (builtins[i]);
-}
-
-/**
- * check_builtins - If command is a builtin command
- * @cmd: an array of command and its arguments
- *
- * Return: the appropriate function to be executed, else NULL
- */
-int (*check_builtins(char **cmd))(char **, int, char *)
-{
-	builtin_t b = is_builtin(cmd[0]);
-
-	if (b.cmd)
-		return (b.f);
-
-	return (NULL);
-}
-
-/**
- * env_cmd - builtin implementation of env command
- * @cmd: Unused
- * @status: the status code
- *
- * Return: Always 0
- */
-int env_cmd(char **cmd, int status, char *filename)
-{
-	int i;
-
-	(void) cmd;
-	(void) status;
-	(void) filename;
-
-	for (i = 0; environ[i]; i++)
+	if (info->argv[1])  /* If there is an exit arguement */
 	{
-		print(environ[i]);
-		_putchar('\n');
+		exitcheck = _erratoi(info->argv[1]);
+		if (exitcheck == -1)
+		{
+			info->status = 2;
+			print_error(info, "Illegal number: ");
+			_eputs(info->argv[1]);
+			_eputchar('\n');
+			return (1);
+		}
+		info->err_num = _erratoi(info->argv[1]);
+		return (-2);
+	}
+	info->err_num = -1;
+	return (-2);
+}
+
+/**
+ * _mycd - changes the current directory of the process
+ * @info: Structure containing potential arguments. Used to maintain
+ *          constant function prototype.
+ *  Return: Always 0
+ */
+int _mycd(info_t *info)
+{
+	char *s, *dir, buffer[1024];
+	int chdir_ret;
+
+	s = getcwd(buffer, 1024);
+	if (!s)
+		_puts("TODO: >>getcwd failure emsg here<<\n");
+	if (!info->argv[1])
+	{
+		dir = _getenv(info, "HOME=");
+		if (!dir)
+			chdir_ret = /* TODO: what should this be? */
+				chdir((dir = _getenv(info, "PWD=")) ? dir : "/");
+		else
+			chdir_ret = chdir(dir);
+	}
+	else if (_strcmp(info->argv[1], "-") == 0)
+	{
+		if (!_getenv(info, "OLDPWD="))
+		{
+			_puts(s);
+			_putchar('\n');
+			return (1);
+		}
+		_puts(_getenv(info, "OLDPWD=")), _putchar('\n');
+		chdir_ret = /* TODO: what should this be? */
+			chdir((dir = _getenv(info, "OLDPWD=")) ? dir : "/");
+	}
+	else
+		chdir_ret = chdir(info->argv[1]);
+	if (chdir_ret == -1)
+	{
+		print_error(info, "can't cd to ");
+		_eputs(info->argv[1]), _eputchar('\n');
+	}
+	else
+	{
+		_setenv(info, "OLDPWD", _getenv(info, "PWD="));
+		_setenv(info, "PWD", getcwd(buffer, 1024));
 	}
 	return (0);
 }
 
 /**
- * exit_cmd - builtin Implementation of exit command
- * @cmd: an array of given command and its arguments
- * @status: the status code
- * @filename: the file that contains the inbuilt command
- *
- * Return: exit with the status code given by user, or
- * previous execution status code
+ * _myhelp - changes the current directory of the process
+ * @info: Structure containing potential arguments. Used to maintain
+ *          constant function prototype.
+ *  Return: Always 0
  */
-int exit_cmd(char **cmd, int status, char *filename)
+int _myhelp(info_t *info)
 {
-	int i = 0;
+	char **arg_array;
 
-	if (!cmd[1])
-	{
-		free_memory_pp(cmd);
-		exit(status);
-	}
-
-	while (cmd[1][i])
-	{
-		if (_isalpha(cmd[1][i]) && cmd[1][i] != '-')
-		{
-			print(filename);
-			print(": ");
-			print(cmd[0]);
-			print(": ");
-			print("Illegal number: ");
-			print(cmd[1]);
-			_putchar('\n');
-			return (1);
-		}
-
-		i++;
-	}
-
-	status = _atoi(cmd[1]);
-	free_memory_pp(cmd);
-
-	exit(status);
-}
+	arg_array = info->argv;
+	_puts("help call works. Function not yet implemented \n");
+	if (0)
+		_puts(*arg_array); /* temp att_unused workaround */
+	return (0);
+}}
