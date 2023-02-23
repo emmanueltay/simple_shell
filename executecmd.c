@@ -10,12 +10,14 @@
 void execmd(char **argv)
 {
 	char *command = NULL;
+	char *main_command = NULL;
 
 	if (argv)
 	{
 		command = argv[0];
+		main_command = get_location(command);
 
-		if (execve(command, argv, NULL) == -1)
+		if (execve(main_command, argv, NULL) == -1)
 		{
 			perror("Error:");
 		}
